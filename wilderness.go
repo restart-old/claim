@@ -1,7 +1,6 @@
 package claim
 
 import (
-	"github.com/df-mc/dragonfly/server/entity/physics"
 	"github.com/df-mc/dragonfly/server/player"
 	"github.com/df-mc/dragonfly/server/world"
 )
@@ -21,8 +20,6 @@ func NewWilderness(w *world.World, enterMSG, leaveMSG string) wilderness {
 		leaveMSG: leaveMSG,
 	}
 }
-
-func (w wilderness) AABB() physics.AABB  { return physics.AABB{} }
 func (w wilderness) Name() string        { return w.name }
 func (w wilderness) World() *world.World { return w.w }
 

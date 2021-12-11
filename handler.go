@@ -32,7 +32,7 @@ func NewClaimHandler(p *player.Player, wild wilderness) *ClaimHandler {
 // HandleBlockBreak handles when a block is broken,
 // and cancels the event if breaking blocks are not allowed in the claim they were broken in.
 func (c *ClaimHandler) HandleBlockBreak(ctx *event.Context, pos cube.Pos, drops *[]item.Stack) {
-	if claim, ok := PosInClaim(pos.Vec3()); ok {
+	if claim, ok := VecInClaimXZ(pos.Vec3()); ok {
 		if !claim.AllowBreakBlock(c.p, pos, drops) {
 			ctx.Cancel()
 		}
@@ -62,7 +62,7 @@ func actuallyMovedXZ(old, new mgl64.Vec3) bool {
 
 func oldAndNewClaim(p *player.Player, newPos mgl64.Vec3) (Claim, Claim) {
 	oldClaim, _ := LoadPlayerClaim(p)
-	newClaim, _ := PosInClaim(newPos)
+	newClaim, _ := VecInClaimXZ(newPos)
 	return oldClaim, newClaim
 }
 

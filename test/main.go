@@ -3,10 +3,10 @@ package main
 import (
 	"github.com/df-mc/dragonfly/server"
 	"github.com/df-mc/dragonfly/server/block/cube"
-	"github.com/df-mc/dragonfly/server/entity/physics"
 	"github.com/df-mc/dragonfly/server/item"
 	"github.com/df-mc/dragonfly/server/player"
 	"github.com/df-mc/dragonfly/server/world"
+	"github.com/dragonfly-on-steroids/area"
 	"github.com/dragonfly-on-steroids/claim"
 	"github.com/go-gl/mathgl/mgl64"
 	"github.com/sirupsen/logrus"
@@ -17,8 +17,8 @@ type testClaim struct {
 	claim.NopClaim
 }
 
-func (testClaim) AABB() physics.AABB {
-	return physics.NewAABB(mgl64.Vec3{0, 0, 0}, mgl64.Vec3{10, 100, 10})
+func (testClaim) Area() area.Area {
+	return area.NewArea(mgl64.Vec2{0, 0}, mgl64.Vec2{10, 10})
 }
 func (testClaim) Name() string          { return "claim" }
 func (t testClaim) World() *world.World { return t.w }

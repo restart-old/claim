@@ -2,10 +2,10 @@ package claim
 
 import (
 	"github.com/df-mc/dragonfly/server/block/cube"
-	"github.com/df-mc/dragonfly/server/entity/physics"
 	"github.com/df-mc/dragonfly/server/item"
 	"github.com/df-mc/dragonfly/server/player"
 	"github.com/df-mc/dragonfly/server/world"
+	"github.com/dragonfly-on-steroids/area"
 	"github.com/go-gl/mathgl/mgl64"
 )
 
@@ -19,7 +19,7 @@ func Claims() []Claim { return claims }
 
 type Claim interface {
 	World() *world.World
-	AABB() physics.AABB
+	Area() area.Area
 	Name() string
 
 	Enter(p *player.Player)
@@ -33,7 +33,7 @@ type Claim interface {
 type NopClaim struct{}
 
 func (NopClaim) World() *world.World    { return nil }
-func (NopClaim) AABB() physics.AABB     { return physics.AABB{} }
+func (NopClaim) Area() area.Area        { return area.Area{} }
 func (NopClaim) Name() string           { return "" }
 func (NopClaim) Enter(p *player.Player) {}
 func (NopClaim) Leave(p *player.Player) {}
@@ -44,15 +44,9 @@ func (NopClaim) AllowBreakBlock(p *player.Player, pos cube.Pos, drops *[]item.St
 func (NopClaim) AllowEnter(p *player.Player) bool                                        { return true }
 func (NopClaim) AllowAttackEntity(*player.Player, world.Entity, *float64, *float64) bool { return true }
 
-func inOrEqual(vec mgl64.Vec3, aabb physics.AABB) bool {
-	if vec[0] < aabb.Min()[0] || vec[0] > aabb.Max()[0] {
-		return false
-	}
-	return vec[2] >= aabb.Min()[2] && vec[2] <= aabb.Max()[2]
-}
-func PosInClaim(pos mgl64.Vec3) (Claim, bool) {
+func VecInClaimXZ(vec mgl64.Vec3) (Claim, bool) {
 	for _, claim := range Claims() {
-		if inOrEqual(pos, claim.AABB()) {
+		if claim.Area().Vec2Within(mgl64.Vec2{vec[0], vec[2]}) {
 			return claim, true
 		}
 	}

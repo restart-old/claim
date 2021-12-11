@@ -2,7 +2,6 @@ package claim
 
 import (
 	"github.com/df-mc/dragonfly/server/block/cube"
-	"github.com/df-mc/dragonfly/server/entity/damage"
 	"github.com/df-mc/dragonfly/server/entity/physics"
 	"github.com/df-mc/dragonfly/server/item"
 	"github.com/df-mc/dragonfly/server/player"
@@ -28,7 +27,7 @@ type Claim interface {
 
 	AllowBreakBlock(p *player.Player, pos cube.Pos, drops *[]item.Stack) bool
 	AllowEnter(p *player.Player) bool
-	AllowHurt(p *player.Player, daamge *float64, src damage.Source) bool
+	AllowAttackEntity(p *player.Player, e world.Entity, force *float64, height *float64) bool
 }
 
 type NopClaim struct{}
@@ -38,11 +37,12 @@ func (NopClaim) AABB() physics.AABB     { return physics.AABB{} }
 func (NopClaim) Name() string           { return "" }
 func (NopClaim) Enter(p *player.Player) {}
 func (NopClaim) Leave(p *player.Player) {}
+
 func (NopClaim) AllowBreakBlock(p *player.Player, pos cube.Pos, drops *[]item.Stack) bool {
 	return true
 }
-func (NopClaim) AllowEnter(p *player.Player) bool                                    { return true }
-func (NopClaim) AllowHurt(p *player.Player, daamge *float64, src damage.Source) bool { return true }
+func (NopClaim) AllowEnter(p *player.Player) bool                                        { return true }
+func (NopClaim) AllowAttackEntity(*player.Player, world.Entity, *float64, *float64) bool { return true }
 
 func inOrEqual(vec mgl64.Vec3, aabb physics.AABB) bool {
 	if vec[0] < aabb.Min()[0] || vec[0] > aabb.Max()[0] {

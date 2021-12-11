@@ -4,10 +4,10 @@ import (
 	"math"
 
 	"github.com/df-mc/dragonfly/server/block/cube"
-	"github.com/df-mc/dragonfly/server/entity/damage"
 	"github.com/df-mc/dragonfly/server/event"
 	"github.com/df-mc/dragonfly/server/item"
 	"github.com/df-mc/dragonfly/server/player"
+	"github.com/df-mc/dragonfly/server/world"
 	"github.com/go-gl/mathgl/mgl64"
 )
 
@@ -32,9 +32,24 @@ func NewClaimHandler(p *player.Player, wild wilderness) *ClaimHandler {
 // HandleBlockBreak handles when a block is broken,
 // and cancels the event if breaking blocks are not allowed in the claim they were broken in.
 func (c *ClaimHandler) HandleBlockBreak(ctx *event.Context, pos cube.Pos, drops *[]item.Stack) {
+	if claim, ok := PosInClaim(pos.Vec3()); ok {
+		if !claim.AllowBreakBlock(c.p, pos, drops) {
+			ctx.Cancel()
+		}
+	}
 }
 
-func (c *ClaimHandler) HandleHurt(ctx *event.Context, damage *float64, src damage.Source) {
+func canHurt(p *player.Player, e world.Entity, force, height *float64) bool {
+	if claim, ok := LoadPlayerClaim(p); ok {
+		return claim.AllowAttackEntity(p, e, force, height)
+	}
+	return true
+}
+
+func (c *ClaimHandler) HandleAttackEntity(ctx *event.Context, e world.Entity, force, height *float64) {
+	if !canHurt(c.p, e, force, height) {
+		ctx.Cancel()
+	}
 }
 
 func actuallyMovedXZ(old, new mgl64.Vec3) bool {

@@ -21,6 +21,8 @@ type ClaimHandler struct {
 	wild wilderness
 }
 
+func (*ClaimHandler) Name() string { return "ClaimHandler" }
+
 // NewClaimHandler returns a new *ClaimHandler.
 func NewClaimHandler(p *player.Player, wild wilderness) *ClaimHandler {
 	return &ClaimHandler{

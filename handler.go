@@ -80,7 +80,6 @@ func finalClaims(wild wilderness, old, new Claim) (Claim, Claim) {
 
 func (c *ClaimHandler) HandleMove(ctx *event.Context, newPos mgl64.Vec3, newYaw, newPitch float64) {
 	if actuallyMovedXZ(c.p.Position(), newPos) {
-		c.p.SendTip(math.Round(newPos[0]), math.Round(newPos[1]), math.Round(newPos[2]))
 		old, new := oldAndNewClaim(c.p, newPos)
 		old, new = finalClaims(c.wild, old, new)
 		if old != new {

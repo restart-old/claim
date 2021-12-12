@@ -1,54 +1,79 @@
 package claim
 
 import (
-	"github.com/df-mc/dragonfly/server/block/cube"
-	"github.com/df-mc/dragonfly/server/item"
+	"sync"
+
+	"github.com/df-mc/dragonfly/server/event"
 	"github.com/df-mc/dragonfly/server/player"
 	"github.com/df-mc/dragonfly/server/world"
 	"github.com/dragonfly-on-steroids/area"
-	"github.com/go-gl/mathgl/mgl64"
 )
 
-var claims []Claim
+var players sync.Map
 
-func Register(c Claim) {
+var claims []*Claim
+
+func Store(c *Claim) {
 	claims = append(claims, c)
 }
-
-func Claims() []Claim { return claims }
-
-type Claim interface {
-	World() *world.World
-	Area() area.Area
-	Name() string
-
-	Enter(p *player.Player)
-	Leave(p *player.Player)
-
-	AllowBreakBlock(p *player.Player, pos cube.Pos, drops *[]item.Stack) bool
-	AllowEnter(p *player.Player) bool
-	AllowAttackEntity(p *player.Player, e world.Entity, force *float64, height *float64) bool
-}
-
-type NopClaim struct{}
-
-func (NopClaim) World() *world.World    { return nil }
-func (NopClaim) Area() area.Area        { return area.Area{} }
-func (NopClaim) Name() string           { return "" }
-func (NopClaim) Enter(p *player.Player) {}
-func (NopClaim) Leave(p *player.Player) {}
-
-func (NopClaim) AllowBreakBlock(p *player.Player, pos cube.Pos, drops *[]item.Stack) bool {
-	return true
-}
-func (NopClaim) AllowEnter(p *player.Player) bool                                        { return true }
-func (NopClaim) AllowAttackEntity(*player.Player, world.Entity, *float64, *float64) bool { return true }
-
-func VecInClaimXZ(vec mgl64.Vec3) (Claim, bool) {
-	for _, claim := range Claims() {
-		if claim.Area().Vec2Within(mgl64.Vec2{vec[0], vec[2]}) {
-			return claim, true
+func Delete(c *Claim) {
+	for n, claim := range claims {
+		if claim == c {
+			claims = append(claims[:n], claims[1+n:]...)
 		}
 	}
-	return nil, false
+}
+
+func Claims() []*Claim { return claims }
+
+func NewClaim(name string, w *world.World, area area.Area) *Claim {
+	return &Claim{
+		world: w,
+		area:  area,
+		h:     NopHandler{},
+		name:  name,
+	}
+}
+
+type Claim struct {
+	name   string
+	world  *world.World
+	area   area.Area
+	hMutex sync.RWMutex
+	h      Handler
+}
+
+func (c *Claim) Name() string        { return c.name }
+func (c *Claim) World() *world.World { return c.world }
+func (c *Claim) Area() area.Area     { return c.area }
+func (c *Claim) handler() Handler    { return c.h }
+func (c *Claim) Handle(h Handler) {
+	c.hMutex.Lock()
+	defer c.hMutex.Unlock()
+	if h == nil {
+		h = NopHandler{}
+	}
+	c.h = h
+}
+func (c *Claim) EnterClaim(ctx *event.Context, p *player.Player) {
+	if claim, _ := players.Load(p); claim != c {
+		if claim == nil {
+			Wilderness.h.HandleLeaveClaim(ctx, p)
+		}
+		c.h.HandleEnterClaim(ctx, p)
+		ctx.Continue(func() {
+			players.Store(p, c)
+		})
+	}
+}
+func (c *Claim) LeaveClaim(ctx *event.Context, p *player.Player) {
+	if claim, _ := players.Load(p); claim == c {
+		c.h.HandleLeaveClaim(ctx, p)
+		ctx.Continue(func() {
+			players.Delete(p)
+		})
+		if claim != Wilderness {
+			Wilderness.h.HandleEnterClaim(ctx, p)
+		}
+	}
 }

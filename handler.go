@@ -1,8 +1,6 @@
 package claim
 
 import (
-	"math"
-
 	"github.com/df-mc/dragonfly/server/block/cube"
 	"github.com/df-mc/dragonfly/server/event"
 	"github.com/df-mc/dragonfly/server/item"
@@ -55,11 +53,7 @@ func (c *ClaimHandler) HandleAttackEntity(ctx *event.Context, e world.Entity, fo
 }
 
 func actuallyMovedXZ(old, new mgl64.Vec3) bool {
-	oldX := math.Round(old.X())
-	oldZ := math.Round(old.Z())
-	newX := math.Round(new.X())
-	newZ := math.Round(new.Z())
-	return oldX != newX || oldZ != newZ
+	return old.X() != new.X() || old.Z() != new.Z()
 }
 
 func oldAndNewClaim(p *player.Player, newPos mgl64.Vec3) (Claim, Claim) {

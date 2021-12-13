@@ -48,7 +48,7 @@ func NewClaimHandler(p *player.Player) *ClaimHandler {
 // and cancels the event if breaking blocks are not allowed in the claim they were broken in.
 func (c *ClaimHandler) HandleBlockBreak(ctx *event.Context, pos cube.Pos, drops *[]item.Stack) {
 	for _, claim := range Claims() {
-		if claim.area.Vec2Within(mgl64.Vec2{pos.Vec3()[0], pos.Vec3()[2]}) {
+		if claim.area.Vec3WithinOrEqualXZ(pos.Vec3()) {
 			claim.h.HandleBlockBreak(ctx, pos, drops)
 			return
 		}
@@ -58,7 +58,7 @@ func (c *ClaimHandler) HandleBlockBreak(ctx *event.Context, pos cube.Pos, drops 
 
 func (c *ClaimHandler) HandleAttackEntity(ctx *event.Context, e world.Entity, force, height *float64) {
 	for _, claim := range Claims() {
-		if claim.area.Vec2Within(mgl64.Vec2{e.Position()[0], e.Position()[2]}) {
+		if claim.area.Vec3WithinOrEqualXZ(e.Position()) {
 			claim.h.HandleAttackEntity(ctx, e, force, height)
 			return
 		}
@@ -74,7 +74,7 @@ func (c *ClaimHandler) HandleMove(ctx *event.Context, newPos mgl64.Vec3, newYaw,
 	if actuallyMovedXZ(c.p.Position(), newPos) {
 		c.p.SendTip(math.Round(newPos[0]), math.Round(newPos[2]))
 		for _, claim := range claims {
-			if !claim.area.Vec2Within(mgl64.Vec2{newPos[0], newPos[2]}) {
+			if !claim.area.Vec3WithinOrEqualXZ(newPos) {
 				claim.LeaveClaim(ctx, c.p)
 			} else {
 				claim.EnterClaim(ctx, c.p)

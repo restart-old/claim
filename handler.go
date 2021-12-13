@@ -72,14 +72,14 @@ func actuallyMovedXZ(old, new mgl64.Vec3) bool {
 
 func (c *ClaimHandler) HandleMove(ctx *event.Context, newPos mgl64.Vec3, newYaw, newPitch float64) {
 	if actuallyMovedXZ(c.p.Position(), newPos) {
-		c.p.SendTip(math.Round(newPos[0]), math.Round(newPos[2]))
+		c.p.SendTip(math.Floor(newPos[0]), math.Floor(newPos[2]))
 		for _, claim := range claims {
-			if !claim.area.Vec3WithinOrEqualXZ(newPos) {
+			newpos := mgl64.Vec2{math.Floor(newPos[0]), math.Floor(newPos[2])}
+			if !claim.area.Vec2WithinOrEqual(newpos) {
 				claim.LeaveClaim(ctx, c.p)
 			} else {
 				claim.EnterClaim(ctx, c.p)
 			}
 		}
 	}
-
 }

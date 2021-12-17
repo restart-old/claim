@@ -26,7 +26,7 @@ func Delete(c *Claim) {
 
 func Claims() []*Claim { return claims }
 
-func NewClaim(name string, w *world.World, area area.Area) *Claim {
+func NewClaim(name string, w *world.World, area area.Vec2) *Claim {
 	return &Claim{
 		world: w,
 		area:  area,
@@ -38,14 +38,14 @@ func NewClaim(name string, w *world.World, area area.Area) *Claim {
 type Claim struct {
 	name   string
 	world  *world.World
-	area   area.Area
+	area   area.Vec2
 	hMutex sync.RWMutex
 	h      Handler
 }
 
 func (c *Claim) Name() string        { return c.name }
 func (c *Claim) World() *world.World { return c.world }
-func (c *Claim) Area() area.Area     { return c.area }
+func (c *Claim) Area() area.Vec2     { return c.area }
 func (c *Claim) handler() Handler    { return c.h }
 func (c *Claim) Handle(h Handler) {
 	c.hMutex.Lock()

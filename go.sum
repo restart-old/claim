@@ -56,6 +56,8 @@ github.com/dragonfly-on-steroids/area v0.0.0-20211211220545-1222ecfe69f6 h1:h3Xz
 github.com/dragonfly-on-steroids/area v0.0.0-20211211220545-1222ecfe69f6/go.mod h1:UPAiXJ0A1DKKb3SuEIAhYT57I0FFjLSm8sv/+FT9En0=
 github.com/dragonfly-on-steroids/area v0.0.0-20211213202250-675962245831 h1:H5FVpeZwvidSfP3Phe4QX6zjnbMH7qXWlkV+i+zn3Ds=
 github.com/dragonfly-on-steroids/area v0.0.0-20211213202250-675962245831/go.mod h1:UPAiXJ0A1DKKb3SuEIAhYT57I0FFjLSm8sv/+FT9En0=
+github.com/dragonfly-on-steroids/area v0.0.0-20211217171802-f5ca142dfa85 h1:/+xpPpxrwEkCLtDCpfW4JMjpDnxUbHtYsVFfZl19AuA=
+github.com/dragonfly-on-steroids/area v0.0.0-20211217171802-f5ca142dfa85/go.mod h1:UPAiXJ0A1DKKb3SuEIAhYT57I0FFjLSm8sv/+FT9En0=
 github.com/envoyproxy/go-control-plane v0.9.0/go.mod h1:YTl/9mNaCwkRvm6d1a2C3ymFceY/DCBVvsKhRF0iEA4=
 github.com/envoyproxy/go-control-plane v0.9.1-0.20191026205805-5f8ba28d4473/go.mod h1:YTl/9mNaCwkRvm6d1a2C3ymFceY/DCBVvsKhRF0iEA4=
 github.com/envoyproxy/go-control-plane v0.9.4/go.mod h1:6rpuAdCZL397s3pYoYcLgu1mIlRU8Am5FuJP05cCM98=

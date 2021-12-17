@@ -21,7 +21,7 @@ func main() {
 	s := server.New(&c, log)
 	s.Start()
 
-	cl := claim.NewClaim("test", s.World(), area.NewArea(mgl64.Vec2{10, 10}, mgl64.Vec2{20, 20}))
+	cl := claim.NewClaim("test", s.World(), area.NewVec2(mgl64.Vec2{10, 10}, mgl64.Vec2{20, 20}))
 	cl.Handle(&ClaimHandler{c: cl})
 	claim.Store(cl)
 	claim.Wilderness.Handle(&ClaimHandler{c: claim.Wilderness})

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"github.com/df-mc/dragonfly/server"
 	"github.com/df-mc/dragonfly/server/block/cube"
 	"github.com/df-mc/dragonfly/server/event"
@@ -9,6 +10,7 @@ import (
 	"github.com/dragonfly-on-steroids/area"
 	"github.com/dragonfly-on-steroids/claim"
 	"github.com/go-gl/mathgl/mgl64"
+	_ "github.com/mattn/go-sqlite3"
 	"github.com/sirupsen/logrus"
 )
 
@@ -20,17 +22,19 @@ func main() {
 	log.Level = logrus.DebugLevel
 	s := server.New(&c, log)
 	s.Start()
-
-	cl := claim.NewClaim("test", s.World(), area.NewVec2(mgl64.Vec2{10, 10}, mgl64.Vec2{20, 20}))
-	cl.Handle(&ClaimHandler{c: cl})
-	claim.Store(cl)
-	claim.Wilderness.Handle(&ClaimHandler{c: claim.Wilderness})
+	//
+	db, _ := sql.Open("sqlite3", "./test.db")
+	_, _ = db.Exec("CREATE TABLE IF NOT EXISTS claims(name TEXT PRIMARY KEY, x1 INT, z1 INT, x2 INT, z2 INT);")
+	testClaim := claim.NewClaim("test", area.NewVec2(mgl64.Vec2{0, 0}, mgl64.Vec2{10, 10}))
+	st := &sqlite3Claimer{db: db}
+	st.Store(testClaim)
+	//
 	for {
 		p, err := s.Accept()
 		if err != nil {
 			return
 		}
-		p.Handle(claim.NewClaimHandler(p))
+		p.Handle(claim.NewClaimHandler(p, st))
 	}
 }
 
@@ -46,7 +50,5 @@ func (c *ClaimHandler) HandleLeaveClaim(ctx *event.Context, p *player.Player) {
 	p.Message("left", c.c.Name())
 }
 func (c *ClaimHandler) HandleBlockBreak(ctx *event.Context, pos cube.Pos, drops *[]item.Stack) {
-	if c.c != claim.Wilderness {
-		ctx.Cancel()
-	}
+	ctx.Cancel()
 }

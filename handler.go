@@ -1,14 +1,13 @@
 package claim
 
 import (
-	"math"
-
 	"github.com/df-mc/dragonfly/server/block/cube"
 	"github.com/df-mc/dragonfly/server/event"
 	"github.com/df-mc/dragonfly/server/item"
 	"github.com/df-mc/dragonfly/server/player"
 	"github.com/df-mc/dragonfly/server/world"
 	"github.com/go-gl/mathgl/mgl64"
+	"log"
 )
 
 type Handler interface {
@@ -33,37 +32,37 @@ func (NopHandler) HandleAttackEntity(ctx *event.Context, e world.Entity, force, 
 type ClaimHandler struct {
 	player.NopHandler
 	p *player.Player
+	Loader
 }
 
 func (*ClaimHandler) Name() string { return "ClaimHandler" }
 
 // NewClaimHandler returns a new *ClaimHandler.
-func NewClaimHandler(p *player.Player) *ClaimHandler {
+func NewClaimHandler(p *player.Player, loader Loader) *ClaimHandler {
 	return &ClaimHandler{
-		p: p,
+		p:      p,
+		Loader: loader,
 	}
 }
 
 // HandleBlockBreak handles when a block is broken,
 // and cancels the event if breaking blocks are not allowed in the claim they were broken in.
 func (c *ClaimHandler) HandleBlockBreak(ctx *event.Context, pos cube.Pos, drops *[]item.Stack) {
-	for _, claim := range Claims() {
-		if claim.area.Vec3WithinOrEqualXZ(pos.Vec3()) {
-			claim.h.HandleBlockBreak(ctx, pos, drops)
-			return
-		}
+	claim, err := c.LoadWithPos(pos.Vec3())
+	if err != nil {
+		log.Println(err)
+		return
 	}
-	Wilderness.h.HandleBlockBreak(ctx, pos, drops)
+	claim.h.HandleBlockBreak(ctx, pos, drops)
 }
 
 func (c *ClaimHandler) HandleAttackEntity(ctx *event.Context, e world.Entity, force, height *float64) {
-	for _, claim := range Claims() {
-		if claim.area.Vec3WithinOrEqualXZ(e.Position()) {
-			claim.h.HandleAttackEntity(ctx, e, force, height)
-			return
-		}
+	claim, err := c.LoadWithPos(e.Position())
+	if err != nil {
+		log.Println(err)
+		return
 	}
-	Wilderness.h.HandleAttackEntity(ctx, e, force, height)
+	claim.h.HandleAttackEntity(ctx, e, force, height)
 }
 
 func actuallyMovedXZ(old, new mgl64.Vec3) bool {
@@ -72,13 +71,11 @@ func actuallyMovedXZ(old, new mgl64.Vec3) bool {
 
 func (c *ClaimHandler) HandleMove(ctx *event.Context, newPos mgl64.Vec3, newYaw, newPitch float64) {
 	if actuallyMovedXZ(c.p.Position(), newPos) {
-		for _, claim := range claims {
-			newpos := mgl64.Vec2{math.Floor(newPos[0]), math.Floor(newPos[2])}
-			if !claim.area.Vec2WithinOrEqual(newpos) {
-				claim.LeaveClaim(ctx, c.p)
-			} else {
-				claim.EnterClaim(ctx, c.p)
-			}
+		claim, err := c.LoadWithPos(newPos)
+		if err != nil {
+			log.Println(err)
+			return
 		}
+		claim.Enter(ctx, c.p)
 	}
 }

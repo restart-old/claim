@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	github.com/df-mc/dragonfly v0.4.3-0.20211211005319-6f45380fec02
-	github.com/dragonfly-on-steroids/area v0.0.0-20211217171802-f5ca142dfa85
+	github.com/dragonfly-on-steroids/area v0.0.0-20211218151724-a0dde3f9da80
 	github.com/go-gl/mathgl v1.0.0
 	github.com/sirupsen/logrus v1.8.1
 )
@@ -17,6 +17,7 @@ require (
 	github.com/golang/snappy v0.0.3 // indirect
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/klauspost/compress v1.13.6 // indirect
+	github.com/mattn/go-sqlite3 v1.14.9 // indirect
 	github.com/muhammadmuzzammil1998/jsonc v0.0.0-20201229145248-615b0916ca38 // indirect
 	github.com/sandertv/go-raknet v1.10.2 // indirect
 	github.com/sandertv/gophertunnel v1.17.1 // indirect

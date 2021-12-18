@@ -11,27 +11,11 @@ import (
 
 var players sync.Map
 
-var claims []*Claim
-
-func Store(c *Claim) {
-	claims = append(claims, c)
-}
-func Delete(c *Claim) {
-	for n, claim := range claims {
-		if claim == c {
-			claims = append(claims[:n], claims[1+n:]...)
-		}
-	}
-}
-
-func Claims() []*Claim { return claims }
-
-func NewClaim(name string, w *world.World, area area.Vec2) *Claim {
+func NewClaim(name string, area area.Vec2) *Claim {
 	return &Claim{
-		world: w,
-		area:  area,
-		h:     NopHandler{},
-		name:  name,
+		area: area,
+		h:    NopHandler{},
+		name: name,
 	}
 }
 
@@ -43,6 +27,12 @@ type Claim struct {
 	h      Handler
 }
 
+func (c *Claim) Compare(claim2 interface{}) bool {
+	if claim, ok := claim2.(*Claim); ok {
+		return c.name == claim.name
+	}
+	return false
+}
 func (c *Claim) Name() string        { return c.name }
 func (c *Claim) World() *world.World { return c.world }
 func (c *Claim) Area() area.Vec2     { return c.area }
@@ -55,25 +45,22 @@ func (c *Claim) Handle(h Handler) {
 	}
 	c.h = h
 }
-func (c *Claim) EnterClaim(ctx *event.Context, p *player.Player) {
-	if claim, _ := players.Load(p); claim != c {
-		if claim == nil {
-			Wilderness.h.HandleLeaveClaim(ctx, p)
-		}
+func (c *Claim) Enter(ctx *event.Context, p *player.Player) {
+	if claim, _ := players.Load(p); !c.Compare(claim) {
 		c.h.HandleEnterClaim(ctx, p)
 		ctx.Continue(func() {
+			if claim, ok := claim.(*Claim); ok {
+				claim.Leave(ctx, p)
+			}
 			players.Store(p, c)
 		})
 	}
 }
-func (c *Claim) LeaveClaim(ctx *event.Context, p *player.Player) {
-	if claim, _ := players.Load(p); claim == c {
+func (c *Claim) Leave(ctx *event.Context, p *player.Player) {
+	if claim, _ := players.Load(p); c.Compare(claim) {
 		c.h.HandleLeaveClaim(ctx, p)
 		ctx.Continue(func() {
 			players.Delete(p)
 		})
-		if claim != Wilderness {
-			Wilderness.h.HandleEnterClaim(ctx, p)
-		}
 	}
 }

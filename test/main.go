@@ -43,10 +43,10 @@ type ClaimHandler struct {
 	c *claim.Claim
 }
 
-func (c *ClaimHandler) HandleEnterClaim(ctx *event.Context, p *player.Player) {
+func (c *ClaimHandler) HandleEnter(ctx *event.Context, p *player.Player) {
 	p.Message("entered", c.c.Name())
 }
-func (c *ClaimHandler) HandleLeaveClaim(ctx *event.Context, p *player.Player) {
+func (c *ClaimHandler) HandleLeave(ctx *event.Context, p *player.Player) {
 	p.Message("left", c.c.Name())
 }
 func (c *ClaimHandler) HandleBlockBreak(ctx *event.Context, pos cube.Pos, drops *[]item.Stack) {

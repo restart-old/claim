@@ -17,6 +17,7 @@ Usage of the Claim library:
 	}
 	// You may use a library, so you can have multiple handlers.
         p.Handle(claim.NewClaimHandler(p, loader))
+	}
 }
 ```
 

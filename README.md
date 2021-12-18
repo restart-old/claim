@@ -19,6 +19,8 @@ Usage of the Claim library:
         p.Handle(claim.NewClaimHandler(p, loader))
     }
 }
+// Let's say our claim area is in between 0,0 and 10,10
+
 ```
 
 ## Creating a loader

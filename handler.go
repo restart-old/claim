@@ -44,11 +44,11 @@ func (NopHandler) HandleBlockBreak(ctx *event.Context, pos cube.Pos, drops *[]it
 func (NopHandler) HandleAttackEntity(ctx *event.Context, e world.Entity, force, height *float64, c *Claim) {
 }
 
-// ClaimHandler is the handler which is used to handle:
+// PlayerHandler is the handler which is used to handle:
 // When a block is broken in a claim.
 // When a player enters or leaves a claim.
 // And when a player is hurt in a claim.
-type ClaimHandler struct {
+type PlayerHandler struct {
 	player.NopHandler
 	p *player.Player
 	Loader
@@ -56,18 +56,18 @@ type ClaimHandler struct {
 
 // Name returns the name of the handler.
 // this may be needed if you're using libraries in which a name is needed for a handler.
-func (*ClaimHandler) Name() string { return "ClaimHandler" }
+func (*PlayerHandler) Name() string { return "ClaimHandler" }
 
-// NewClaimHandler returns a new *ClaimHandler.
-func NewClaimHandler(p *player.Player, loader Loader) *ClaimHandler {
-	return &ClaimHandler{
+// NewPlayerHandler returns a new *ClaimHandler.
+func NewPlayerHandler(p *player.Player, loader Loader) *PlayerHandler {
+	return &PlayerHandler{
 		p:      p,
 		Loader: loader,
 	}
 }
 
 // HandleBlockBreak handles when a block is broken,
-func (c *ClaimHandler) HandleBlockBreak(ctx *event.Context, pos cube.Pos, drops *[]item.Stack) {
+func (c *PlayerHandler) HandleBlockBreak(ctx *event.Context, pos cube.Pos, drops *[]item.Stack) {
 	claim, err := c.LoadWithPos(pos.Vec3())
 	if err != nil {
 		log.Println(err)
@@ -78,7 +78,7 @@ func (c *ClaimHandler) HandleBlockBreak(ctx *event.Context, pos cube.Pos, drops 
 
 // HandleAttackEntity handles when an entity is hit while being in a claim.
 // warning: it may be called even if the source is not in the claim.
-func (c *ClaimHandler) HandleAttackEntity(ctx *event.Context, e world.Entity, force, height *float64) {
+func (c *PlayerHandler) HandleAttackEntity(ctx *event.Context, e world.Entity, force, height *float64) {
 	claim, err := c.LoadWithPos(e.Position())
 	if err != nil {
 		log.Println(err)
@@ -95,7 +95,7 @@ func actuallyMovedXZ(old, new mgl64.Vec3) bool {
 
 // HandleMove handles when a player moves.
 // It calls Enter if it finds out that the player is in a claim.
-func (c *ClaimHandler) HandleMove(ctx *event.Context, newPos mgl64.Vec3, newYaw, newPitch float64) {
+func (c *PlayerHandler) HandleMove(ctx *event.Context, newPos mgl64.Vec3, newYaw, newPitch float64) {
 	if actuallyMovedXZ(c.p.Position(), newPos) {
 		claim, err := c.LoadWithPos(newPos)
 		if err != nil {

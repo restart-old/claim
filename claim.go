@@ -62,7 +62,7 @@ func (c *Claim) Handle(h Handler) {
 // It also leaves the previous claim, if any.
 func (c *Claim) Enter(ctx *event.Context, p *player.Player) {
 	if claim, _ := players.Load(p); !c.Compare(claim) {
-		c.h.HandleEnter(ctx, p)
+		c.h.HandleEnter(ctx, p, c)
 		ctx.Continue(func() {
 			if claim, ok := claim.(*Claim); ok {
 				claim.Leave(ctx, p)
@@ -75,7 +75,7 @@ func (c *Claim) Enter(ctx *event.Context, p *player.Player) {
 // Leave leaves the claim if the given player is in it.
 func (c *Claim) Leave(ctx *event.Context, p *player.Player) {
 	if claim, _ := players.Load(p); c.Compare(claim) {
-		c.h.HandleLeave(ctx, p)
+		c.h.HandleLeave(ctx, p, c)
 		ctx.Continue(func() {
 			players.Delete(p)
 		})

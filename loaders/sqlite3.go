@@ -22,7 +22,7 @@ func NewSQL(db *sql.DB, h claim.Handler) (*SQL, error) {
 }
 
 func (s *SQL) Delete(claim *claim.Claim) error {
-	_, err := s.db.Exec("DELETE FROM claims WHERE name='?';", claim.Name())
+	_, err := s.db.Exec(fmt.Sprintf("DELETE FROM claims WHERE name='%s';", claim.Name()))
 	return err
 }
 

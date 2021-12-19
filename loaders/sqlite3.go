@@ -59,6 +59,9 @@ func (s *SQL) LoadWithPos(v mgl64.Vec3) (*claim.Claim, error) {
 			return nil, err
 		}
 	}
+	if name == "" {
+		return claim.NewClaim("The Wilderness", area.Vec2{}), nil
+	}
 	xf := float64(x1)
 	xl := float64(x2)
 	zf := float64(z1)

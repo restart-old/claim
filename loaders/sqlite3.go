@@ -60,7 +60,9 @@ func (s *SQL) LoadWithPos(v mgl64.Vec3) (*claim.Claim, error) {
 		}
 	}
 	if name == "" {
-		return claim.NewClaim("The Wilderness", area.Vec2{}), nil
+		wild := claim.NewClaim("The Wilderness", area.Vec2{})
+		wild.Handle(s.h)
+		return wild, nil
 	}
 	xf := float64(x1)
 	xl := float64(x2)
@@ -70,8 +72,6 @@ func (s *SQL) LoadWithPos(v mgl64.Vec3) (*claim.Claim, error) {
 	max, min := mgl64.Vec2{xf, zf}, mgl64.Vec2{xl, zl}
 	a := area.NewVec2(max, min)
 	newClaim := claim.NewClaim(name, a)
-	if s.h != nil {
-		newClaim.Handle(s.h)
-	}
+	newClaim.Handle(s.h)
 	return newClaim, nil
 }

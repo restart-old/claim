@@ -17,7 +17,7 @@ Usage of the Claim library:
 	}
 	// You may use a library, so you can have multiple handlers.
         p.Handle(claim.NewClaimHandler(p, loader))
-    }
+	}
 }
 // Let's say our claim area is in between 0,0 and 10,10
 
